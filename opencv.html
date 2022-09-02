@@ -73,10 +73,10 @@
                 // // schedule the next one.
             
                 cap.read(src);
-                src.copyto(dst);
+                src.copyTo(dst);
                 cv.cvtColor(dst, gray, cv.COLOR_RGBA2GRAY);
 
-                det.detectMultiScale(gray, vRect);
+                det.detectMultiScale(gray, vRect, 1.1, 3, 0);
 
                 console.log(vRect.size());
 
