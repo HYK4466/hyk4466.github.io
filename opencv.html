@@ -68,12 +68,15 @@
             try {
                 let begin = Date.now();
                 // cap.read(src);
-                // cv.cvtColor(src, dst, cv.COLOR_RGBA2GRAY);
+                //cv.cvtColor(src, dst, cv.COLOR_RGBA2GRAY);
                 // cv.imshow('canvasOutput', dst);
                 // // schedule the next one.
             
                 cap.read(src);
-                det.detectMultiScale(src, vRect);
+                src.copyto(dst);
+                cv.cvtColor(dst, gray, cv.COLOR_RGBA2GRAY);
+
+                det.detectMultiScale(gray, vRect);
 
                 console.log(vRect.size());
 
