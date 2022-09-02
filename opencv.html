@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Head Counter</title>
+    <script src="js/utils.js"></script>
+
+</head>
+
+<body onload="setSize()">
+
+    <p id="status">OpenCV.js status: Loading...</p>
+
+    <button id="cvtGray" onclick="detectFace()" style="visibility: visible;">Convert to Gray</button>
+
+    <video id="videoInput"></video>
+    <br>
+    <canvas id="canvasOutput"></canvas>
+
+    <script>
+
+        let width = 640;
+        let height = 480;
+    
+        let src, dst, cap, det, vRect, gray;
+        const FPS = 60;
+
+
+        function detectFace() {
+
+            vRect = new cv.RectVector();
+            det = new cv.CascadeClassifier();
+            // https://raw.githubusercontent.com/opencv/opencv/master/data/haarcascades/haarcascade_frontalface_default.xml
+
+            
+            let u = new Utils('errorMessage');
+            
+            let modelFile = "haarcascade_frontalface_default.xml";
+    
+            u.createFileFromUrl(modelFile, modelFile, () => {
+                det.load(modelFile);
+            });
+        
+            det.load("haarcascade_frontalface_default.xml");
+            
+            src = new cv.Mat(height, width, cv.CV_8UC4);
+            dst = new cv.Mat(height, width, cv.CV_8UC1);
+            gray = new cv.Mat();
+            cap = new cv.VideoCapture("videoInput");
+            setTimeout(processVideo, 0);
+        }
+
+        function setSize() {
+            if (window.orientation == 0) {
+                //portrait
+                width = 480; height = 640;
+            }
+            else {
+                //landscape
+                width = 640; height = 480;
+            }
+        }
+
+        function onOpenCvReady() {
+            document.getElementById('status').innerHTML = 'OpenCV.js status: Ready.';
+        }
+
+        function processVideo() {
+            try {
+                let begin = Date.now();
+                // cap.read(src);
+                // cv.cvtColor(src, dst, cv.COLOR_RGBA2GRAY);
+                // cv.imshow('canvasOutput', dst);
+                // // schedule the next one.
+            
+                cap.read(src);
+                det.detectMultiScale(src, vRect);
+
+                console.log(vRect.size());
+
+                for (let i = 0; i < vRect.size(); i++) {
+                    let d = vRect.get(i);
+                    let p1 = new cv.Point(d.x, d.y);
+                    let p2 = new cv.Point(d.x+d.width, d.y+d.height);
+                    cv.rectangle(dst, p1, p2, [255, 0, 0, 255]);
+                }
+
+                cv.imshow("canvasOutput", dst);
+
+                let delay = 1000/FPS - (Date.now() - begin);
+                setTimeout(processVideo, delay);
+            }
+            catch (err) {
+                console.log(err);
+            }
+        }
+
+        
+        let video = document.getElementById("videoInput");
+        let canvas = document.getElementById("canvasOutput")
+        video.height = height;
+        video.width = width;
+        canvas.height = height;
+        canvas.width = width;
+        navigator.mediaDevices.getUserMedia({video: true , audio: false})
+        .then((stream) => {
+            
+            video.srcObject = stream;
+            video.play();
+        })
+        .catch((err) => {
+            console.log("An error occurred");
+        });
+
+
+    </script>
+
+<script asnyc src="https://docs.opencv.org/4.5.0/opencv.js" onload="onOpenCvReady();"></script>
+
+</body>
+</html>
