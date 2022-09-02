@@ -80,6 +80,10 @@
 
                 console.log(vRect.size());
 
+                if (vRect.size() > 1) {
+                    alert("MORE THAN TWO FACES DETECTED!");
+                }
+
                 for (let i = 0; i < vRect.size(); i++) {
                     let d = vRect.get(i);
                     let p1 = new cv.Point(d.x, d.y);
